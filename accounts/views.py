@@ -1,9 +1,11 @@
-from django.shortcuts import render
-from django.views.generic import FormView,RedirectView
-from .forms import UserRegistrationForm
+from django.shortcuts import render,redirect
+from django.views.generic import FormView
+from .forms import UserRegistrationForm,UserUpdateForm
 from django.contrib.auth import login
 from django.urls import reverse_lazy
+from django.views import View
 from django.contrib.auth.views import LoginView,LogoutView
+from .models import UserBankAccount, UserAddress
 
 # Create your views here.
 
@@ -26,6 +28,27 @@ class UserLoginView(LoginView):
 
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy('home')
+    
+    
+    
+class UserProfileView(View):
+    template_name = 'accounts/profile.html'
+
+    def get(self, request):
+        user = request.user
+        try:
+            user_account = UserBankAccount.objects.get(user=user)
+            user_address = UserAddress.objects.get(user=user)
+        except UserBankAccount.DoesNotExist or UserAddress.DoesNotExist:
+            user_account = None
+            user_address = None
+
+        context = {
+            'user': user,
+            'user_account': user_account,
+            'user_address': user_address,
+        }
+        return render(request, self.template_name, context)
    
      
     
