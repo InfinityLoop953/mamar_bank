@@ -1,12 +1,20 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from django.utils import timezone
+from django.shortcuts import get_object_or_404, redirect
+from django.views import View
 from django.http import HttpResponse
 from django.views.generic import CreateView, ListView
-from transactions.constants import DEPOSIT,WITHDRAWAL,LOAN
-from transactions.forms import DepositForm,WithdrawForm,LoanRequestForm
+from transactions.constants import DEPOSIT, WITHDRAWAL,LOAN, LOAN_PAID
+from datetime import datetime
 from transactions.models import Transaction
 
+from transactions.forms import (
+    DepositForm,
+    WithdrawForm,
+    LoanRequestForm,
+)
 
 class TransactionCreateMixin(LoginRequiredMixin, CreateView):
     template_name = 'transactions/transaction_form.html'
@@ -127,4 +135,41 @@ class TransactionReportView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['account'] = self.request.user.account
         return context
+    
+    
+    
+class PayLoanView(LoginRequiredMixin, View):
+     def get(self, request, loan_id):
+        loan = get_object_or_404(Transaction, id=loan_id)
+        print(loan)
+        if loan.loan_approve:
+            user_account = loan.account
+            
+            if loan.amount < user_account.balance:
+                user_account.balance -= loan.amount
+                loan.balance_after_transaction = user_account.balance
+                user_account.save()
+                loan.loan_approved = True
+                loan.transaction_type = LOAN_PAID
+                loan.save()
+                return redirect('loan_list')
+            else:
+                messages.error(
+            self.request,
+            f'Loan amount is greater than available balance'
+        )
+
+        return redirect('loan_list')
+
+
+class LoanListView(LoginRequiredMixin,ListView):
+    model = Transaction
+    template_name = 'transactions/loan_request.html'
+    context_object_name = 'loans' # loan list ta ei loans context er moddhe thakbe
+    
+    def get_queryset(self):
+        user_account = self.request.user.account
+        queryset = Transaction.objects.filter(account=user_account,transaction_type=3)
+        print(queryset)
+        return queryset
 
