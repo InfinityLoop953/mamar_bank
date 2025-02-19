@@ -8,7 +8,7 @@ class Transaction(models.Model):
     
     amount = models.DecimalField(decimal_places=2,max_digits=12)
     balance_after_transaction = models.DecimalField(decimal_places=2,max_digits=12)
-    transaction_type = models.CharField(choices=TRANSACTION_TYPE,null=True,max_length=10)
+    transaction_type = models.IntegerField(choices=TRANSACTION_TYPE, null = True)  
     timestamp = models.DateTimeField(auto_now_add=True)
     loan_approve = models.BooleanField(default=False)
     

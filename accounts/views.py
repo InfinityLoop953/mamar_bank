@@ -12,7 +12,7 @@ from .models import UserBankAccount, UserAddress
 class UserRegistrationsView(FormView):
     template_name = 'accounts/user_registration.html'
     form_class = UserRegistrationForm
-    success_url = reverse_lazy('register')
+    success_url = reverse_lazy('home')
     
     def form_valid(self,form):
         print(form.cleaned_data)
