@@ -1,9 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from django.http import HttpResponse
 from django.views.generic import CreateView, ListView
-from transactions.constants import DEPOSIT,WITHDRAWAL
-from transactions.forms import DepositForm,WithdrawForm
+from transactions.constants import DEPOSIT,WITHDRAWAL,LOAN
+from transactions.forms import DepositForm,WithdrawForm,LoanRequestForm
 from transactions.models import Transaction
 
 
@@ -90,7 +91,26 @@ class WithdrawMoneyView(TransactionCreateMixin):
 
         return super().form_valid(form)
 
+class LoanRequestView(TransactionCreateMixin):
+    form_class = LoanRequestForm
+    title = 'Request For Loan'
 
+    def get_initial(self):
+        initial = {'transaction_type': LOAN}
+        return initial
+
+    def form_valid(self, form):
+        amount = form.cleaned_data.get('amount')
+        current_loan_count = Transaction.objects.filter(
+            account=self.request.user.account,transaction_type=3,loan_approve=True).count()
+        if current_loan_count >= 3:
+            return HttpResponse("You have cross the loan limits")
+        messages.success(
+            self.request,
+            f'Loan request for {"{:,.2f}".format(float(amount))}$ submitted successfully'
+        )
+
+        return super().form_valid(form)
 
 
 class TransactionReportView(LoginRequiredMixin, ListView):
@@ -100,7 +120,7 @@ class TransactionReportView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         transactions = Transaction.objects.filter(account=self.request.user.account).order_by('-timestamp')[:10]
-        print("Transactions Retrieved:", transactions)  #
+        print("Transactions Retrieved:", transactions)  
         return transactions
 
     def get_context_data(self, **kwargs):

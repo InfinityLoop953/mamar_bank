@@ -2,31 +2,35 @@
 {% block head_title %}Transaction Report{% endblock %} 
 {% block content %}
 
-{% if messages %}
-            {% for message in messages %}
-                {% if forloop.last %}
-                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-5">
-                        <p class="text-lg font-bold">{{ message }}</p>
-                    </div>
-                {% endif %}
-            {% endfor %}
-  {% endif %}
 
+{% if messages %}
+    {% for message in messages %}
+        {% if forloop.last %}
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-5">
+                <p class="text-lg font-bold">{{ message }}</p>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
 <div class="w-full flex mt-5 justify-center">
     <div class="bg-white w-5/12 rounded-lg text-center">
         <h1 class="font-bold text-3xl pb-5 pt-10 px-5">Transaction Report</h1>
         <hr class="mb-5">
+
         {% for transaction in object_list %}
             <p class="text-lg mb-4">
                 {% if transaction.transaction_type == 1 %}
                     Successfully deposited ${{ transaction.amount|floatformat:2 }}.
                 {% elif transaction.transaction_type == 2 %}
                     Successfully withdrawn ${{ transaction.amount|floatformat:2 }}.
+                {% elif transaction.transaction_type == 3 %}
+                    Loan request for ${{ transaction.amount|floatformat:2 }} submitted successfully.
 
                 {% endif %}
             </p>
         {% endfor %}
+
         <p class="text-lg font-bold mt-5">
             Current Balance: ${{ account.balance|floatformat:2 }}
         </p>
