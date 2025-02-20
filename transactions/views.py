@@ -59,7 +59,7 @@ class DepositMoneyView(TransactionCreateMixin):
 
         messages.success(
             self.request,
-            f'{"{:,.2f}".format(float(amount))}$ was deposited to your account successfully'
+            f'BDT {"{:,.2f}".format(float(amount))} was deposited to your account successfully'
         )
 
         return super().form_valid(form)
@@ -82,7 +82,7 @@ class WithdrawMoneyView(TransactionCreateMixin):
 
         messages.success(
             self.request,
-            f'Successfully withdrawn {"{:,.2f}".format(float(amount))}$ from your account'
+            f'Successfully withdrawn BDT {"{:,.2f}".format(float(amount))} from your account'
         )
 
         return super().form_valid(form)
@@ -103,7 +103,7 @@ class LoanRequestView(TransactionCreateMixin):
             return HttpResponse("You have cross the loan limits")
         messages.success(
             self.request,
-            f'Loan request for {"{:,.2f}".format(float(amount))}$ submitted successfully'
+            f'Loan request for BDT {"{:,.2f}".format(float(amount))} submitted successfully'
         )
 
         return super().form_valid(form)
@@ -156,7 +156,7 @@ class PayLoanView(LoginRequiredMixin, View):
                 loan.loan_approved = True
                 loan.transaction_type = LOAN_PAID
                 loan.save()
-                return redirect('transactions:loan_list')
+                return redirect('loan_list')
             else:
                 messages.error(
             self.request,
