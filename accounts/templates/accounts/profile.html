@@ -2,7 +2,19 @@
 {% block head_title %}Profile Information{% endblock %}
 {% block content %}
 <div class="bg-white px-3 py-4 rounded-xl my-6">
-    <h4 class="font-bold text-3xl text-left pb-5">Account NO: {{ user_account.account_no }}</h4>
+    <div class="flex justify-between items-center pb-5">
+        <h4 class="font-bold text-3xl">Account NO: {{ user_account.account_no }}</h4>
+        <a href="{% url 'password_change'%}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Change Password
+        </a>
+        
+        
+        
+    </div>
+    
+
+
+    
     <h1 class="font-bold text-3xl text-center pb-5">Profile Information</h1>
 
     <div class="w-full mt-10">
@@ -101,6 +113,8 @@
                     </p>
                 </div>
             </div>
+
+     
         </div>
     </div>
 </div>

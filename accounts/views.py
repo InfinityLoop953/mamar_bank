@@ -4,8 +4,11 @@ from .forms import UserRegistrationForm,UserUpdateForm
 from django.contrib.auth import login
 from django.urls import reverse_lazy
 from django.views import View
-from django.contrib.auth.views import LoginView,LogoutView
+from django.contrib.auth.views import LoginView,LogoutView,PasswordChangeView
 from .models import UserBankAccount, UserAddress
+from django.contrib.auth import update_session_auth_hash
+
+
 
 # Create your views here.
 
@@ -49,6 +52,22 @@ class UserProfileView(View):
             'user_address': user_address,
         }
         return render(request, self.template_name, context)
+    
+    
+
+from django.contrib.auth import logout
+
+class UserPasswordChangeView(PasswordChangeView):
+    template_name = 'accounts/passchange.html'
+    success_url = reverse_lazy('login')  # Redirect to login page after logout
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        logout(self.request)  # Log the user out
+        return response
+
+            
+
    
      
     
